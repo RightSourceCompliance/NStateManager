@@ -80,31 +80,5 @@ namespace NStateManager.Tests.Async
                 Assert.False(result.WasCancelled);
             }
         }
-
-        [Fact]
-        public async Task ExecuteAsync_treats_lack_of_transitions_as_failed_condition()
-        {
-            var sut = new NStateManager.Async.StateTransitionDynamic<Sale, SaleState, SaleEvent>(
-                stateAccessor: sale => sale.State
-                , stateMutator: (sale, newState) => sale.State = newState
-                , stateFunctionAsync: (sale, cancelToken) => Task.FromResult(SaleState.Open)
-                , name: "test"
-                , priority: 1);
-
-            using (var cancellationSource = new CancellationTokenSource())
-            {
-                var sale = new Sale(saleId: 87) { State = SaleState.Open };
-                var parameters = new ExecutionParameters<Sale, SaleEvent>(SaleEvent.Pay, sale, cancellationToken: cancellationSource.Token);
-
-                var result = await sut.ExecuteAsync(parameters);
-
-                Assert.False(result.ConditionMet);
-                Assert.False(result.WasTransitioned);
-                Assert.False(result.WasCancelled);
-                Assert.Equal(SaleState.Open, sale.State);
-                Assert.Equal(SaleState.Open, result.CurrentState);
-                Assert.Equal(SaleState.Open, result.PreviousState);
-            }
-        }
     }
 }

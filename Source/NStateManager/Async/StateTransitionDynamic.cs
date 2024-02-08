@@ -41,25 +41,19 @@ namespace NStateManager.Async
             if (parameters.CancellationToken.IsCancellationRequested)
             { return GetFreshResult(parameters, currentResult, startState, wasCancelled: true, transitionDefined: true, conditionMet: false); }
 
-            TState toState;
             try
             {
-                toState = await StateFunctionAsync(parameters.Context, parameters.CancellationToken)
+                var toState = await StateFunctionAsync(parameters.Context, parameters.CancellationToken)
                     .ConfigureAwait(continueOnCapturedContext: false);
+
+                StateMutator(parameters.Context, toState);
             }
             catch(DynamicTransitionFailureException ex)
             {
                 return GetFreshResult(parameters, currentResult, StateAccessor(parameters.Context), wasCancelled: false, transitionDefined: true, conditionMet: false);
             }
 
-            var transitioned = !toState.IsEqual(startState);
-
-            if (transitioned)
-            {
-                StateMutator(parameters.Context, toState);
-            }
-
-            return GetFreshResult(parameters, currentResult, startState, wasCancelled: parameters.CancellationToken.IsCancellationRequested, transitionDefined: true, conditionMet: transitioned);
+            return GetFreshResult(parameters, currentResult, startState, wasCancelled: parameters.CancellationToken.IsCancellationRequested, transitionDefined: true, conditionMet: true);
         }
     }
 }
