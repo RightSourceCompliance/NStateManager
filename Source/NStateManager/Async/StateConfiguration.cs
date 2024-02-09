@@ -8,6 +8,16 @@
 //distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and limitations under the License.
 #endregion
+#region Copyright (c) 2024 Yardi Systems, Inc.
+//
+//Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+//compliance with the License. You may obtain a copy of the License at
+//http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software distributed under the License is 
+//distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and limitations under the License.
+#endregion
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -159,6 +169,31 @@ namespace NStateManager.Async
 
             var transition = StateTransitionFactory<T, TState, TTrigger>.GetStateTransition(_stateMachine
                 , stateFunction
+                , name
+                , priority);
+            AddTransition(trigger, transition);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Defines a state transition where the end state is defined by a function.
+        /// </summary>
+        /// <param name="trigger">The <see cref="TTrigger"/> to use this transition.</param>
+        /// <param name="stateFunctionAsync">The asynchronous function to determine the state.</param>
+        /// <param name="name"></param>
+        /// <param name="priority"></param>
+        /// <returns></returns>
+        public IStateConfiguration<T, TState, TTrigger> AddDynamicTransition(TTrigger trigger
+            , Func<T, CancellationToken, Task<TState>> stateFunctionAsync
+            , string name = null
+            , uint priority = 1)
+        {
+            if (stateFunctionAsync == null)
+            { throw new ArgumentNullException(nameof(stateFunctionAsync)); }
+
+            var transition = StateTransitionFactory<T, TState, TTrigger>.GetStateTransition(_stateMachine
+                , stateFunctionAsync
                 , name
                 , priority);
             AddTransition(trigger, transition);

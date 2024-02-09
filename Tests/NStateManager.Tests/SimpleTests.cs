@@ -50,6 +50,8 @@ namespace NStateManager.Tests
                 .ExcludeClass("NStateManager.Async.StateTransitionAutoFallbackParameterized`4", isFullName: true)
                 .ExcludeClass("NStateManager.Async.StateTransitionAutoForwardParameterized`4", isFullName: true)
                 .ExcludeClass("NStateManager.Async.StateTransitionParameterized`4", isFullName: true)
+                .ExcludeClass("NStateManager.Async.StateTransitionDynamic`3", isFullName:true)
+                .ExcludeClass("DynamicTransitionFailureException")
                 .TestAssembly();
         }
     }

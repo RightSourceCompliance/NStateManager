@@ -8,6 +8,16 @@
 //distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and limitations under the License.
 #endregion
+#region Copyright (c) 2024 Yardi Systems, Inc.
+//
+//Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+//compliance with the License. You may obtain a copy of the License at
+//http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software distributed under the License is 
+//distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and limitations under the License.
+#endregion
 using System.Threading.Tasks;
 using Xunit;
 
@@ -79,17 +89,17 @@ namespace NStateManager.Tests
             Assert.IsType<StateTransitionDynamic<Sale, SaleState, SaleEvent>>(result);
         }
 
-        //[Fact]
-        //public void GetStateTransitionWithAsyncStateFunc_returns_StateTransitionDynamic()
-        //{
-        //    var stateMachine = new StateMachine<Sale, SaleState, SaleEvent>(sale => sale.State, (sale, newState) => sale.State = newState);
-        //    var result = StateTransitionFactory<Sale, SaleState, SaleEvent>.GetStateTransition(stateMachine
-        //      , stateFuncAsync: (sale, cancelToken) => Task.FromResult(SaleState.Complete)
-        //      , name: "test"
-        //      , priority: 1);
+        [Fact]
+        public void GetStateTransitionWithAsyncStateFunc_returns_StateTransitionDynamic()
+        {
+            var stateMachine = new NStateManager.Async.StateMachine<Sale, SaleState, SaleEvent>(sale => sale.State, (sale, newState) => sale.State = newState);
+            var result = StateTransitionFactory<Sale, SaleState, SaleEvent>.GetStateTransition(stateMachine
+              , stateFunctionAsync: (sale, cancelToken) => Task.FromResult(SaleState.Complete)
+              , name: "test"
+              , priority: 1);
 
-        //    Assert.IsType<StateTransitionDynamicAsync<Sale, SaleState, SaleEvent>>(result);
-        //}
+            Assert.IsType<NStateManager.Async.StateTransitionDynamic<Sale, SaleState, SaleEvent>>(result);
+        }
 
         [Fact]
         public void GetStateTransitionWithTResultAndStateFunc_returns_StateTransitionDynamicParameterized()

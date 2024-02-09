@@ -8,6 +8,16 @@
 //distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and limitations under the License.
 #endregion
+#region Copyright (c) 2024 Yardi Systems, Inc.
+//
+//Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+//compliance with the License. You may obtain a copy of the License at
+//http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software distributed under the License is 
+//distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and limitations under the License.
+#endregion
 using NStateManager.Async;
 using System;
 using System.Diagnostics;
@@ -61,12 +71,32 @@ namespace NStateManager.Tests.Async
         }
 
         [Fact]
+        public void AddDynamicTransition_async_throws_ArgumentNullException_if_Function_null()
+        {
+            var stateMachine = new StateMachine<Sale, SaleState, SaleEvent>(sale => sale.State, (sale, newState) => sale.State = newState);
+            var sut = new StateConfiguration<Sale, SaleState, SaleEvent>(SaleState.ChangeDue, stateMachine);
+
+            Assert.Throws<ArgumentNullException>(() => sut.AddDynamicTransition(SaleEvent.AddItem, stateFunctionAsync: null));
+        }
+
+        [Fact]
         public void AddDynamicTransition_adds_transition()
         {
             var stateMachine = new StateMachine<Sale, SaleState, SaleEvent>(sale => sale.State, (sale, newState) => sale.State = newState);
             var sut = new StateConfiguration<Sale, SaleState, SaleEvent>(SaleState.ChangeDue, stateMachine);
 
             sut.AddDynamicTransition(SaleEvent.AddItem, stateFunction: sale => SaleState.Complete);
+
+            Assert.Single(sut.Transitions);
+        }
+
+        [Fact]
+        public void AddDynamicTransition_async_adds_transition()
+        {
+            var stateMachine = new StateMachine<Sale, SaleState, SaleEvent>(sale => sale.State, (sale, newState) => sale.State = newState);
+            var sut = new StateConfiguration<Sale, SaleState, SaleEvent>(SaleState.ChangeDue, stateMachine);
+
+            sut.AddDynamicTransition(SaleEvent.AddItem, stateFunctionAsync: (sale, cancelToken) => Task.FromResult(SaleState.Complete));
 
             Assert.Single(sut.Transitions);
         }
